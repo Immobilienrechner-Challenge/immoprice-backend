@@ -99,6 +99,7 @@ class PredictionHistGradientBoostingRegression:
         last_refurbishment=None,
         year_built=None,
     ):
+        # set attributes with correct type
         self.living_space = np.float(living_space)
         self.floor_space = np.float(floor_space)
         self.type = type
@@ -108,9 +109,10 @@ class PredictionHistGradientBoostingRegression:
         self.last_refurbishment = np.float(last_refurbishment)
         self.year_built = np.float(year_built)
 
-    def predict(self):
+    def __generateDataFrame(self, cols, data_plz):
+        # create empty dataframe with columns
         df = pd.DataFrame(columns=cols, index=[0])
-
+        # fill dataframe with values
         if self.living_space:
             df["living_space"] = self.living_space
         if self.floor_space:
@@ -123,23 +125,41 @@ class PredictionHistGradientBoostingRegression:
             df["last_refurbishment"] = self.last_refurbishment
         if self.year_built:
             df["year_built"] = self.year_built
-
+        # special case for type
         if self.type:
             for col in df.columns:
                 if "type_" in col:
                     df[col] = 0
             df[f"type_{self.type}"] = 1
-
+        # special case for zip_code
         if self.zip_code:
             df["zip_code"] = self.zip_code
             df[data_plz.columns] = data_plz.loc[self.zip_code]
+        # return dataframe
+        return df
 
-        df = pd.DataFrame(scaler.transform(df[cols]), columns=cols)
+    def __scaleDataFrame(self, df, cols, scaler):
+        # scale dataframe
+        return pd.DataFrame(scaler.transform(df[cols]), columns=cols)
 
+    def __getPrediction(self, df, cols, model):
+        # get prediction
         prediction = model.predict(df[cols])[0]
+        # scale prediction (because of log transformation)
         prediction = np.exp(prediction)
+        # round prediction
         prediction = np.round(prediction, -3)
+        # make sure prediction is not negative
         prediction = np.max([0, prediction])
+        # make sure prediction is an integer
         prediction = int(prediction)
-
+        # return prediction
         return prediction
+
+    def predict(self):
+        # generate dataframe
+        df = self.__generateDataFrame(cols, data_plz)
+        # scale dataframe
+        df = self.__scaleDataFrame(df, cols, scaler)
+        # return prediction
+        return self.__getPrediction(df, cols, model)

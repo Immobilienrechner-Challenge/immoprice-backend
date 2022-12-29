@@ -1,3 +1,9 @@
 from django.test import TestCase
 
-# Create your tests here.
+
+class ModelTest(TestCase):
+    def test(self):
+        self.assertEqual("lmao", "lmao")
+
+    def test2(self):
+        self.assertEqual("rofl", "rofl")
