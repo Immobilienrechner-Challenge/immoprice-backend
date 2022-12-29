@@ -113,17 +113,17 @@ class PredictionHistGradientBoostingRegression:
         # create empty dataframe with columns
         df = pd.DataFrame(columns=cols, index=[0])
         # fill dataframe with values
-        if self.living_space:
+        if not np.isnan(self.living_space):
             df["living_space"] = self.living_space
-        if self.floor_space:
+        if not np.isnan(self.floor_space):
             df["floor_space"] = self.floor_space
-        if self.plot_area:
+        if not np.isnan(self.plot_area):
             df["plot_area"] = self.plot_area
-        if self.rooms:
+        if not np.isnan(self.rooms):
             df["rooms"] = self.rooms
-        if self.last_refurbishment:
+        if not np.isnan(self.last_refurbishment):
             df["last_refurbishment"] = self.last_refurbishment
-        if self.year_built:
+        if not np.isnan(self.year_built):
             df["year_built"] = self.year_built
         # special case for type
         if self.type:
@@ -132,7 +132,7 @@ class PredictionHistGradientBoostingRegression:
                     df[col] = 0
             df[f"type_{self.type}"] = 1
         # special case for zip_code
-        if self.zip_code:
+        if not np.isnan(self.zip_code):
             df["zip_code"] = self.zip_code
             df[data_plz.columns] = data_plz.loc[self.zip_code]
         # return dataframe
