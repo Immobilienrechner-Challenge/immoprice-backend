@@ -85,6 +85,29 @@ cols = [
     "Latitude",
     "gde_politics_svp",
 ]
+types = [
+    "attic-flat",
+    "attic-room",
+    "castle",
+    "chalet",
+    "detached-house",
+    "detached-secondary-suite",
+    "duplex-maisonette",
+    "farmhouse",
+    "flat",
+    "furnished-residential-property",
+    "loft",
+    "penthouse",
+    "rustico",
+    "secondary-suite",
+    "semi-detached-house",
+    "single-room",
+    "stepped-apartment",
+    "stepped-house",
+    "studio",
+    "terrace-house",
+    "villa",
+]
 
 # Create your models here.
 class PredictionHistGradientBoostingRegression:
@@ -157,6 +180,19 @@ class PredictionHistGradientBoostingRegression:
         return prediction
 
     def predict(self):
+        # checks
+        # return None if living_space, type, rooms or zip_code is missing
+        if (
+            np.isnan(self.living_space)
+            or not self.type
+            or np.isnan(self.rooms)
+            or np.isnan(self.zip_code)
+        ):
+            return None
+        # return None if type is invalid
+        if self.type not in types:
+            return None
+
         # generate dataframe
         df = self.__generateDataFrame(cols, data_plz)
         # scale dataframe
